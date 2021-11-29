@@ -1,0 +1,25 @@
+.input {
+    background-color: #F8F8F8;
+    border: none;
+    padding: 10px;
+    width: 100%;
+    font-size: 1.5rem;
+    position: relative;
+  }
+.deleteButton {
+    background-color: red;
+    font-weight: 600;
+    border-radius: 3rem;
+    cursor: pointer;
+    position: absolute;
+    top: -1px;
+    right: 55px;
+    width: 1.5rem;
+    height:1.5rem;
+    padding: none;
+    text-align: center;
+}
+.deleteButton-text {
+    margin:auto;
+    font-size: .8rem;
+}
