@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import AddressInput from "./components/AddressInput/AddressInput.js"
 import './App.css';
-import { SECRET_KEY } from './env.js';
 
 function App() {
 
@@ -96,7 +95,7 @@ function App() {
   function constructURL(locations) {
     let urlBeginning = 'https://maps.googleapis.com/maps/api/distancematrix/json?destinations='
     let addresses = constructURLAddresses(locations);
-    let url = addresses + '&origins=' + addresses + '&key=' + SECRET_KEY;
+    let url = addresses + '&origins=' + addresses + '&key='
     return addresses;
   };
 
