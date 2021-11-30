@@ -10,6 +10,8 @@
   "author": "gregplechaty <gplechaty@gmail.com>",
   "license": "ISC",
   "dependencies": {
+    "@googlemaps/google-maps-services-js": "^3.3.3",
+    "dotenv": "^10.0.0",
     "express": "^4.17.1"
   }
 }
