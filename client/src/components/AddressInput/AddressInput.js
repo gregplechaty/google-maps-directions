@@ -6,18 +6,29 @@ function AddressInput(props) {
   
   return (
     <div className="input" key={props.location.id}>
-        <label className="form-label">{props.location.id}</label>
+      <div className="input-label">
+        {props.index === 0 ?
+        <label>Start</label>
+        : <label>{props.index}</label>
+        }
+        
+      </div>
+      <div className="input-textField">
         <input 
-          className="form-content"
-          name={props.location.id}
-          type="text"
-          placeholder="Start/End Location"
-          value={props.location.address}
-          onChange={(ev) => props.onChange(ev, props.index, 'address')}
+            className="form-content"
+            name={props.location}
+            type="text"
+            placeholder="Start/End Location"
+            value={props.location}
+            onChange={(ev) => props.onChange(ev, props.index)}
         />
+      </div>
+      {props.index > 2 ? 
         <div className="deleteButton" onClick={() => props.onDeleteLocation(props.index)}>
-          <div className="deleteButton-text">X</div>
+        < div className="deleteButton-text">X</div>
         </div>
+      : null}
+      
     </div>
   );
 }
