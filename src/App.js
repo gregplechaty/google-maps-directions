@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import AddressInput from "./components/AddressInput/AddressInput.js"
 import './App.css';
 
@@ -11,8 +11,9 @@ function App() {
   const [message, setMessage] = useState('');
   const [directionsResult, setDirectionsResult] = useState([]);
   const [legNum, setLegNum] = useState(1);
+  const [totalDistance, setTotalDistance] = useState(); 
 
-  console.log('what on earth:', directionsResult.length)
+  useEffect(() => computeTotalDistance(directionsResult), [directionsResult]);
   
   const errorMessages = {
     NOT_FOUND: 'At least one location could not be identified.',
@@ -94,6 +95,17 @@ function App() {
     };
     return waypoints;
   }
+
+  function computeTotalDistance(directionsResult) {
+    let total = 0;
+    for (let i = 0; i < directionsResult.length; i++) {
+      total += directionsResult[i].distance.value;
+    }
+    total = total / 1609;
+    total = Math.round((total + Number.EPSILON) * 100) / 100
+    setTotalDistance(total + " mi");
+  }
+  
 
 /////////////// Primary Function ///////////////
 
@@ -281,7 +293,9 @@ function callback(response, status) {
           </div>
         </div>
         <div className="flex-column">
-          <h2>Your optimized route: TODO miles</h2>
+          {totalDistance ? <h2>Your optimized route: {totalDistance} miles</h2> 
+          : <h2>Directions will appear below</h2> }
+          
           <h5>Click on a leg of your route to show directions:</h5>
           <ol className="leg--list">
             {directionsResult.map((leg, i) => (
