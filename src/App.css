@@ -19,22 +19,28 @@
   background-color: #002d5d;
   color:white;
   cursor: pointer;
-  width: 13rem;
+  width: 15rem;
   min-height: 5rem;
   margin: 1rem 2rem;
   padding: 0.5rem;
+  text-align: center;
   border: 1px solid #002d5d;
   transition: border .2s;
 }
 .button:hover {
   border: 1px solid black;
 }
+
+.button p {
+  margin: .75rem;
+}
+
 .leg--button {
   font-size: 1.2rem;
   cursor: pointer;
   border-radius: 0.75rem;
   background-color: pink;
-  max-width: 25rem;
+  width: 35rem;
   margin:1rem;
   padding: 0.5rem;
   border: 1px solid black;
@@ -48,4 +54,42 @@
 }
 .button--shadow:hover {
   box-shadow: 4px 3px 7px rgba(0, 0, 0, 0.97);
+}
+
+
+.leg--list {
+  list-style: none;
+  counter-reset: counter;
+  display: flex;
+  flex-wrap: wrap;
+  margin: 0;
+  padding: 0;
+}
+.leg--list li {
+  counter-increment: counter;
+  display: flex;
+  margin-bottom: 0.5rem;
+}
+.leg--list li::before {
+  content: counter(counter);
+  font-weight: bold;
+  font-size: 2rem;
+  margin-right: 0.5rem;
+  line-height: 1;
+}
+
+
+
+body {
+  padding: 1rem;
+  font-family: sans-serif;
+  background-color: #F8F8F8;
+}
+
+h1 {
+  margin: 0;
+  color: #0082ca;
+  --fontSize: 35;
+  line-height: 1.5;
+  font-family: Bungee;
 }

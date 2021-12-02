@@ -1,6 +1,5 @@
 .input {
     display: flex;
-    background-color: #F8F8F8;
     border: none;
     padding: 10px;
     width: 100%;
@@ -8,18 +7,18 @@
   }
 .input-label {
     padding: 0 .5rem;
+    margin: 0 1rem 0 0;
     width: 3rem;
     text-align:end;
 }
 
 .input-textField input {
-    font-size: 1.3rem;
+    font-size: 1rem;
     padding: 0rem 0.5rem;
-    width: 15rem;
+    width: 20rem;
     border-radius: .7rem;
     border: 1px grey solid;
     box-shadow:0 0 15px 4px rgba(0,0,0,0.06);
-    width: 15rem;
     height: 2rem;
     border-radius: 1rem;
     border: 0;
