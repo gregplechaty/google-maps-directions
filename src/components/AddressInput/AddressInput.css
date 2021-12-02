@@ -11,8 +11,19 @@
     width: 3rem;
     text-align:end;
 }
-.input-textField {
-    padding: 0 .5rem;
+
+.input-textField input {
+    font-size: 1.3rem;
+    padding: 0rem 0.5rem;
+    width: 15rem;
+    border-radius: .7rem;
+    border: 1px grey solid;
+    box-shadow:0 0 15px 4px rgba(0,0,0,0.06);
+    width: 15rem;
+    height: 2rem;
+    border-radius: 1rem;
+    border: 0;
+    box-shadow:4px 4px 10px rgba(0,0,0,0.06);
 }
 .deleteButton {
     background-color: red;

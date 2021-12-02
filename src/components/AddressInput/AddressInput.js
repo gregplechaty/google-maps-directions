@@ -18,13 +18,13 @@ function AddressInput(props) {
             className="form-content"
             name={props.location}
             type="text"
-            placeholder="Start/End Location"
+            placeholder={props.index === 0 ? 'Start/End Location'  : 'Stop'}
             value={props.location}
             onChange={(ev) => props.onChange(ev, props.index)}
         />
       </div>
       {props.index > 2 ? 
-        <div className="deleteButton" onClick={() => props.onDeleteLocation(props.index)}>
+        <div className="deleteButton button--shadow" onClick={() => props.onDeleteLocation(props.index)}>
         < div className="deleteButton-text">X</div>
         </div>
       : null}
