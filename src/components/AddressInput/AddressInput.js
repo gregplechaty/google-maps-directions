@@ -23,7 +23,7 @@ function AddressInput(props) {
             onChange={(ev) => props.onChange(ev, props.index)}
         />
       </div>
-      {props.index > 2 ? 
+      {props.index > 1 ? 
         <div className="deleteButton button--shadow" onClick={() => props.onDeleteLocation(props.index)}>
         < div className="deleteButton-text">X</div>
         </div>

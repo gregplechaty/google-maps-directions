@@ -1,13 +1,12 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import AddressInput from "./components/AddressInput/AddressInput.js"
 import './App.css';
 
 
 function App() {
   
-
-  const [locations, setLocations] = useState(['', '', '',]);
+  const [locations, setLocations] = useState(['', '',]);
   const [message, setMessage] = useState();
   const [directionsResult, setDirectionsResult] = useState([]);
   const [legNum, setLegNum] = useState(0);
@@ -37,7 +36,7 @@ function App() {
     setLocations(newList);
   }
   function deleteLocation(i) {
-    if (locations.length > 3) {
+    if (locations.length > 2) {
       let newList = [...locations]
       newList.splice(i,1);
       setLocations(newList);
@@ -55,7 +54,7 @@ function App() {
 
 /////////////// Primary Functions ///////////////
 
-  function controller(locations) {
+  function controller(locations, optimizeSetting) {
     if (optimizeSetting === 'Distance') {
       generateShortestRouteDirections();
     } else {
@@ -205,6 +204,9 @@ function App() {
             [array[1], array[0],],
         ];
     }
+    if (array.length === 1) {
+      return [array]
+    }
     const arrOfArrs = createRouteCombinations(array.slice(1)); //chop off first item in array, use rest
     let routeCombinations = [];
     let tempArray = [];
@@ -218,11 +220,7 @@ function App() {
   }
   
   function addZeros(combos) {
-    let newComboList = [];
-    for (let combo of combos) {
-      newComboList.push([0, ...combo, 0]);
-    };
-    return newComboList;
+    return combos.map(combo => [0, ...combo, 0])
   };
 
   function calcShortestRoute(comboArrays, distanceObject) {
@@ -275,7 +273,7 @@ function App() {
             <p>Add Destination (up to 6 total)</p>
           </div>
           <div className="button button--shadow"
-            onClick={() => controller(locations)}>
+            onClick={() => controller(locations, optimizeSetting)}>
             <p>Get Shortest Route!</p>
           </div>
         </div>
