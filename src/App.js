@@ -11,7 +11,8 @@ function App() {
   const [message, setMessage] = useState('');
   const [directionsResult, setDirectionsResult] = useState([]);
   const [legNum, setLegNum] = useState(1);
-  const [totalDistance, setTotalDistance] = useState(); 
+  const [totalDistance, setTotalDistance] = useState();
+  const [optimizeSetting, setOptimizeSetting] = useState('Driving Time');
 
   useEffect(() => computeTotalDistance(directionsResult), [directionsResult]);
   
@@ -48,9 +49,58 @@ function App() {
 
 /////////////// One Call, that's all ///////////////
 
-  function calcRoute() {
+  
+
+  function postErrorMessage(status) {
+    if (errorMessages[status]) {
+      setMessage(errorMessages[status]);
+    } else {
+      setMessage('Directions could not be found for an unknown reason.');
+    };
+  };
+
+  function optimizeMethod(optimizeSetting) {
+    let optimizeWaypointsYN = true;
+    if (optimizeSetting === 'Distance') {
+      optimizeWaypointsYN = false;
+    };
+    return optimizeWaypointsYN;
+  }
+
+  function createWaypoints(locations) {
+    let waypoints = [];
+    for (let location of locations.slice(1)) {
+      waypoints.push({'location': location,})
+    };    
+    return waypoints;
+  }
+
+  function computeTotalDistance(directionsResult) {
+    let total = 0;
+    for (let i = 0; i < directionsResult.length; i++) {
+      total += directionsResult[i].distance.value;
+    }
+    total = total / 1609;
+    total = Math.round((total + Number.EPSILON) * 100) / 100
+    setTotalDistance(total + " mi");
+  }
+  
+
+/////////////// Primary Functions ///////////////
+
+  function controller(locations) {
+    if (optimizeSetting === 'Distance') {
+      generateShortestRouteDirections();
+    } else {
+      calcRoute(locations);
+    }
+  }
+
+  function calcRoute(locations) {
     const google = window.google;
     let directionsService = new google.maps.DirectionsService();
+    const optimizeWaypointsYN = optimizeMethod(optimizeSetting);
+    const directionsWaypoints = createWaypoints(locations);
     const request = {
       origin: locations[0],
       destination: locations[0],
@@ -60,7 +110,7 @@ function App() {
         trafficModel: 'bestguess'
       },
       unitSystem: google.maps.UnitSystem.IMPERIAL,
-      waypoints: createWaypoints(locations),
+      waypoints: directionsWaypoints,
       optimizeWaypoints: true,
       //provideRouteAlternatives: true,
       //avoidFerries: true,
@@ -78,36 +128,6 @@ function App() {
       };
     });
   }
-
-  function postErrorMessage(status) {
-    if (errorMessages[status]) {
-      setMessage(errorMessages[status]);
-    } else {
-      setMessage('Directions could not be found for an unknown reason.');
-    };
-  };
-
-
-  function createWaypoints(locations) {
-    let waypoints = [];
-    for (let location of locations.slice(1)) {
-      waypoints.push({'location': location,})
-    };
-    return waypoints;
-  }
-
-  function computeTotalDistance(directionsResult) {
-    let total = 0;
-    for (let i = 0; i < directionsResult.length; i++) {
-      total += directionsResult[i].distance.value;
-    }
-    total = total / 1609;
-    total = Math.round((total + Number.EPSILON) * 100) / 100
-    setTotalDistance(total + " mi");
-  }
-  
-
-/////////////// Primary Function ///////////////
 
   function generateShortestRouteDirections() {
     const google = window.google;
@@ -129,9 +149,17 @@ function App() {
       const routeCombinations = addZeros(incompleteRouteCombinations)
       //console.log('routeCombinations', routeCombinations)
       const shortestRoute = calcShortestRoute(routeCombinations, distanceData);
-      //console.log('shortestRoute', shortestRoute)
+      const locationsByDistance = []
+      for (let index of shortestRoute.slice(0,shortestRoute.length-1)) {
+        locationsByDistance.push(locations[index])
+      }
+      calcRoute(locationsByDistance)
     })   
   };
+
+
+
+  //////////////////////////////////////////////////////
 
   function createLocationList(locations) {
     let locationList = [];
@@ -275,6 +303,17 @@ function callback(response, status) {
       <div className="flex-wrap">
         <div className="flex-column">
           <h2>Enter addresses below:</h2>
+          <div className="dropdown--optimize">
+            <legend className="dropdown--optimize--child">Optimize by:</legend>
+              <select name="optimize" className="dropdown--optimize--child"
+                value={optimizeSetting}
+                onChange={(ev) => setOptimizeSetting(ev.target.value)}
+              >
+                <option>Driving Time</option>
+                <option>Distance</option>
+              </select>
+          </div>
+          
           {locations.map((location, i) =>(
                 <AddressInput 
                 location={location}
@@ -288,12 +327,12 @@ function callback(response, status) {
             <p>Add Destination (up to 6 total)</p>
           </div>
           <div className="button button--shadow"
-            onClick={calcRoute}>
+            onClick={() => controller(locations)}>
             <p>Get Shortest Route!</p>
           </div>
         </div>
         <div className="flex-column">
-          {totalDistance ? <h2>Your optimized route: {totalDistance} miles</h2> 
+          {totalDistance ? <h2>Your optimized route: {totalDistance}</h2> 
           : <h2>Directions will appear below</h2> }
           
           <h5>Click on a leg of your route to show directions:</h5>

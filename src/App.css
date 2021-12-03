@@ -11,7 +11,13 @@
   margin: 1rem;
 }
 
+.dropdown--optimize {
+  display: flex;
+}
 
+.dropdown--optimize--child {
+  margin: 0.5rem;
+}
 
 .button {
   font-size: 1.4rem;
