@@ -4,7 +4,11 @@ This program will take a start/end location, and up to 6 stops, and calculate th
 
 ## Getting Started
 - Clone the repository locally.
-- Separately, get an API key for Google Maps. If you don't have one, [check this page](https://developers.google.com/maps/documentation/javascript/get-api-key) for how to set up an account and get a key.
+- Separately, get an API key for Google Maps.
+    - If you don't have one, [check this page](https://developers.google.com/maps/documentation/javascript/get-api-key) for how to set up an account and get a key.
+    - You'll need to make sure the key is enabled for the following APIs:
+    - Directions API
+    - Distance Matrix API
 - Open up /public/index.index. CTRL+F for "YOUR_API_KEY", and replace this text with your key.
 - in the root directory, run `npm install` to get all packages.
 - in the root directory, run `npm run start` to start the program.
