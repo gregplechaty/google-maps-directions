@@ -11,10 +11,7 @@ function App() {
   const [message, setMessage] = useState();
   const [directionsResult, setDirectionsResult] = useState([]);
   const [legNum, setLegNum] = useState(0);
-  const [totalDistance, setTotalDistance] = useState();
   const [optimizeSetting, setOptimizeSetting] = useState('Driving Time');
-
-  useEffect(() => computeTotalDistance(directionsResult), [directionsResult]);
   
   const errorMessages = {
     NOT_FOUND: 'At least one location could not be identified.',
@@ -167,7 +164,7 @@ function App() {
     }
     total = total / 1609;
     total = Math.round((total + Number.EPSILON) * 100) / 100
-    setTotalDistance(total + " mi");
+    return total;
   }
 
   function createLocationList(locations) {
@@ -245,6 +242,7 @@ function App() {
     return minDistanceCombo;
   } ;
   
+  const totalDistance = computeTotalDistance(directionsResult);
 ///////////////////////////////////////////////////////////////
 
   return (
@@ -282,7 +280,7 @@ function App() {
           </div>
         </div>
         <div className="flex-column">
-          {totalDistance ? <h2>Your optimized route: {totalDistance}</h2> 
+          {totalDistance !== 0 ? <h2>Your optimized route: {totalDistance}</h2> 
           : <h2>Directions will appear below</h2> }
           { message ? <p className="errorMessage">{message}</p> : null}
           
@@ -298,7 +296,7 @@ function App() {
             <ol>
 
               {directionsResult.length > 0 ? directionsResult[legNum].steps.map(step => (
-                  <li key={step.start_location + step.distance}>{step.instructions} ({step.distance.text})</li>
+                  <li key={step.start_location + step.distance}>{step.instructions.replace(/<[^>]*>?/gm, '')} ({step.distance.text})</li>
               )) : null}
             </ol> 
             <p>End: {directionsResult.length > 0 ? directionsResult[legNum].end_address : null}</p> 
