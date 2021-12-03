@@ -10,7 +10,7 @@ function App() {
   const [locations, setLocations] = useState(['', '', '',]);
   const [message, setMessage] = useState('');
   const [directionsResult, setDirectionsResult] = useState([]);
-  const [legNum, setLegNum] = useState(1);
+  const [legNum, setLegNum] = useState(0);
   const [totalDistance, setTotalDistance] = useState();
   const [optimizeSetting, setOptimizeSetting] = useState('Driving Time');
 
@@ -25,7 +25,7 @@ function App() {
     REQUEST_DENIED: 'Request Denied. The webpage is not allowed to use the directions service.',
     UNKNOWN_ERROR: 'Your directions request could not be processed due to a server error. The request may succeed if you try again.',
   }
-  /////////////// Location functions ///////////////
+  /////////////// Location CRUD functions ///////////////
 
   function createLocation() {
     if (locations.length < 7) {
@@ -47,10 +47,6 @@ function App() {
     }
   }
 
-/////////////// One Call, that's all ///////////////
-
-  
-
   function postErrorMessage(status) {
     if (errorMessages[status]) {
       setMessage(errorMessages[status]);
@@ -59,32 +55,6 @@ function App() {
     };
   };
 
-  function optimizeMethod(optimizeSetting) {
-    let optimizeWaypointsYN = true;
-    if (optimizeSetting === 'Distance') {
-      optimizeWaypointsYN = false;
-    };
-    return optimizeWaypointsYN;
-  }
-
-  function createWaypoints(locations) {
-    let waypoints = [];
-    for (let location of locations.slice(1)) {
-      waypoints.push({'location': location,})
-    };    
-    return waypoints;
-  }
-
-  function computeTotalDistance(directionsResult) {
-    let total = 0;
-    for (let i = 0; i < directionsResult.length; i++) {
-      total += directionsResult[i].distance.value;
-    }
-    total = total / 1609;
-    total = Math.round((total + Number.EPSILON) * 100) / 100
-    setTotalDistance(total + " mi");
-  }
-  
 
 /////////////// Primary Functions ///////////////
 
@@ -93,8 +63,8 @@ function App() {
       generateShortestRouteDirections();
     } else {
       calcRoute(locations);
-    }
-  }
+    };
+  };
 
   function calcRoute(locations) {
     const google = window.google;
@@ -121,7 +91,6 @@ function App() {
     
     directionsService.route(request, function(response, status) {
       if (status == 'OK') {
-        console.log('response:', response, response.routes[0].legs);
         setDirectionsResult(response.routes[0].legs);
       } else {
         postErrorMessage(status);
@@ -141,25 +110,46 @@ function App() {
       })
     .then(response => {
       const distanceData = createDistanceData(response);
-      //console.log('distanceData', distanceData)
-      const initialCombo = initCombo(distanceData['details']['numOfAddresses']-1)
-      //console.log('initialCombo', initialCombo)
+      const initialCombo = initCombo(distanceData['details']['numOfAddresses']-1);
       const incompleteRouteCombinations = createRouteCombinations(initialCombo);
-      //console.log('routeCombinations', incompleteRouteCombinations)
-      const routeCombinations = addZeros(incompleteRouteCombinations)
-      //console.log('routeCombinations', routeCombinations)
+      const routeCombinations = addZeros(incompleteRouteCombinations);
       const shortestRoute = calcShortestRoute(routeCombinations, distanceData);
-      const locationsByDistance = []
+      const locationsByDistance = [];
       for (let index of shortestRoute.slice(0,shortestRoute.length-1)) {
-        locationsByDistance.push(locations[index])
-      }
-      calcRoute(locationsByDistance)
+        locationsByDistance.push(locations[index]);
+      };
+      calcRoute(locationsByDistance);
     })   
   };
 
+/////////////// Helper Functions ///////////////
 
 
-  //////////////////////////////////////////////////////
+  function optimizeMethod(optimizeSetting) {
+    let optimizeWaypointsYN = true;
+    if (optimizeSetting === 'Distance') {
+      optimizeWaypointsYN = false;
+    };
+    return optimizeWaypointsYN;
+  };
+
+  function createWaypoints(locations) {
+    let waypoints = [];
+    for (let location of locations.slice(1)) {
+      waypoints.push({'location': location,})
+    };    
+    return waypoints;
+  }
+
+  function computeTotalDistance(directionsResult) {
+    let total = 0;
+    for (let i = 0; i < directionsResult.length; i++) {
+      total += directionsResult[i].distance.value;
+    }
+    total = total / 1609;
+    total = Math.round((total + Number.EPSILON) * 100) / 100
+    setTotalDistance(total + " mi");
+  }
 
   function createLocationList(locations) {
     let locationList = [];
@@ -168,7 +158,6 @@ function App() {
     };
     return locationList;
   };
-
 
   function createDistanceData(response) { /// Create Data Matrix ///
     var origins = response.originAddresses;
@@ -182,11 +171,9 @@ function App() {
       for (let j = 0; j < response.rows[i].elements.length; j++) {
         var distance = response.rows[i].elements[j].distance.value;
         tempArray.push(distance);
-        console.log('distance:', distance);
-      }
+      };
       distanceData[i]['distances'] = tempArray;
-    }
-    //console.log('lookie here:', distanceData)
+    };
     return distanceData;
   }
 
@@ -195,7 +182,7 @@ function App() {
     return range;
   }
 
-  function createRouteCombinations(array) { // Create all route combinations
+  function createRouteCombinations(array) { // Create all route combinations recursively
     if (array.length === 2) {
         return [
             [array[0], array[1],],
@@ -213,12 +200,12 @@ function App() {
     }
     return routeCombinations;
   }
-
+  
   function addZeros(combos) {
     let newComboList = [];
     for (let combo of combos) {
       newComboList.push([0, ...combo, 0]);
-    }
+    };
     return newComboList;
   };
 
@@ -230,48 +217,23 @@ function App() {
       distanceSum = 0;
         for (let i=0; i<combo.length-1; i++) {
           distanceSum = distanceSum + distanceObject[combo[i]]['distances'][combo[i+1]];
-        }
+        };
         if (distanceSum < minDistance) {
             minDistance = distanceSum;
             minDistanceCombo = combo;
-        }
-    }
+        };
+    };
     return minDistanceCombo;
-  } 
+  } ;
+  
+  
+  /////////////// Error Handling ///////////////
 
-
-  ////////////////////////// Example distanceObject (temporary)
-
-  let distanceObject = {
-    details: {
-      numOfAddresses: 3,
-    },
-    0: {
-        name: 'waukesha, wi',
-        distances: [0, 6074, 31087, 9978]
-    },
-    1: {
-        name: 'pewaukee, wi',
-        distances: [6938, 0, 28446, 9281]
-    },
-    2: {
-        name: 'milwaukee, wi',
-        distances: [31375, 28792, 0, 2872]
-    },
-    3: {
-      name: 'new berlin, wi',
-      distances: [31375, 28792, 3432, 0]
-  },
-}
-
-////////////////////////// Example initial array, and set of combinations (temporary)
-const exampleArray = [1,2,3];
 
 
 function callback(response, status) {
   if (status == 'OK') {
     var origins = response.originAddresses;
-    var destinations = response.destinationAddresses;
     let distancesOnlyMatrix = [];
     for (var i = 0; i < origins.length; i++) {
       var results = response.rows[i].elements;
@@ -280,15 +242,9 @@ function callback(response, status) {
         var element = results[j];
         var distance = element.distance.text;
         tempArray.push(distance);
-        var duration = element.duration.text;
-        console.log('distance:', distance);
-        var from = origins[i];
-        var to = destinations[j];
       }
       distancesOnlyMatrix.push(tempArray);
     }
-    //setDistanceMatrixData(results);
-    console.log(distancesOnlyMatrix);
     return distancesOnlyMatrix;
   } else {
     console.log('status is not OK. status = ', status);
@@ -338,16 +294,16 @@ function callback(response, status) {
           <h5>Click on a leg of your route to show directions:</h5>
           <ol className="leg--list">
             {directionsResult.map((leg, i) => (
-                <li className="leg--button button--shadow" onClick={() => setLegNum(i)}>{leg.start_address} --> {leg.end_address} ({leg.distance.text})</li>
+                <li key = {leg.start_address} className="leg--button button--shadow" onClick={() => setLegNum(i)}>{leg.start_address} --> {leg.end_address} ({leg.distance.text})</li>
             ))}
-          </ol>
+          </ol> 
           <h6>Directions:</h6>
           <div>
             <p>Start: {directionsResult.length > 0 ? directionsResult[legNum].start_address : null }</p>
             <ol>
 
               {directionsResult.length > 0 ? directionsResult[legNum].steps.map(step => (
-                  <li>{step.instructions} ({step.distance.text})</li>
+                  <li key={step.start_location + step.distance}>{step.instructions} ({step.distance.text})</li>
               )) : null}
             </ol> 
             <p>End: {directionsResult.length > 0 ? directionsResult[legNum].end_address : null}</p> 
