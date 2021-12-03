@@ -9,6 +9,13 @@ This program will take a start/end location, and up to 6 stops, and calculate th
 - in the root directory, run `npm install` to get all packages.
 - in the root directory, run `npm run start` to start the program.
 
+## Using the route calculator
+
+- To add stops along the route, click the "Add Destination" button. They can be deleted if you don't need them; avoid submitting requests with blank or invalid addresses.
+- The app defaults to optimizing by driving time (at the time the request is submitted). Change to "distance" if you want directions optimized purely by distance.
+- Generate directions by clicking 'Get Shortest Route!'
+- Once directions are generated, click on the pink buttons to toggle directions between legs of your journey.
+- Currently all directions assume you are driving.
 
 ## API's used:
 ##### Courtsey of Google Maps API services
