@@ -8,7 +8,7 @@ function App() {
   
 
   const [locations, setLocations] = useState(['', '', '',]);
-  const [message, setMessage] = useState('');
+  const [message, setMessage] = useState();
   const [directionsResult, setDirectionsResult] = useState([]);
   const [legNum, setLegNum] = useState(0);
   const [totalDistance, setTotalDistance] = useState();
@@ -90,10 +90,11 @@ function App() {
     };
     
     directionsService.route(request, function(response, status) {
-      if (status == 'OK') {
-        setDirectionsResult(response.routes[0].legs);
-      } else {
+      if (status !== 'OK') {
         postErrorMessage(status);
+      } else {
+        setMessage();
+        setDirectionsResult(response.routes[0].legs);
       };
     });
   }
@@ -102,26 +103,44 @@ function App() {
     const google = window.google;
     const locationList = createLocationList(locations);
     var service = new google.maps.DistanceMatrixService();
-    service.getDistanceMatrix({
-        origins: locationList,
-        destinations: locationList,
-        travelMode: 'DRIVING',
-        //unitSystem: google.maps.UnitSystem.IMPERIAL,
-      })
-    .then(response => {
-      const distanceData = createDistanceData(response);
-      const initialCombo = initCombo(distanceData['details']['numOfAddresses']-1);
-      const incompleteRouteCombinations = createRouteCombinations(initialCombo);
-      const routeCombinations = addZeros(incompleteRouteCombinations);
-      const shortestRoute = calcShortestRoute(routeCombinations, distanceData);
-      const locationsByDistance = [];
-      for (let index of shortestRoute.slice(0,shortestRoute.length-1)) {
-        locationsByDistance.push(locations[index]);
+    const request = {
+      origins: locationList,
+      destinations: locationList,
+      travelMode: 'DRIVING',
+    };
+    service.getDistanceMatrix(request, function(response, status) {
+      if (status !== 'OK') {
+        postErrorMessage(response, status)
+      } else {
+        if (lookForErrors(response) !== "OK") {
+          return;
+        };
+        setMessage();
+        const distanceData = createDistanceData(response);
+        const initialCombo = initCombo(distanceData['details']['numOfAddresses']-1);
+        const incompleteRouteCombinations = createRouteCombinations(initialCombo);
+        const routeCombinations = addZeros(incompleteRouteCombinations);
+        const shortestRoute = calcShortestRoute(routeCombinations, distanceData);
+        const locationsByDistance = [];
+        for (let index of shortestRoute.slice(0,shortestRoute.length-1)) {
+          locationsByDistance.push(locations[index]);
+        };
+        calcRoute(locationsByDistance);
       };
-      calcRoute(locationsByDistance);
-    })   
-  };
+    });
+  }
 
+  function lookForErrors(response) {
+    for (let object of response.rows) {
+      for (let element of object.elements) {
+        if (element.status !== "OK") {
+          setMessage(element.status);
+          return;
+        }
+      }
+    }
+    return 'OK';
+  }
 /////////////// Helper Functions ///////////////
 
 
@@ -226,32 +245,7 @@ function App() {
     return minDistanceCombo;
   } ;
   
-  
-  /////////////// Error Handling ///////////////
-
-
-
-function callback(response, status) {
-  if (status == 'OK') {
-    var origins = response.originAddresses;
-    let distancesOnlyMatrix = [];
-    for (var i = 0; i < origins.length; i++) {
-      var results = response.rows[i].elements;
-      let tempArray = [];
-      for (var j = 0; j < results.length; j++) {
-        var element = results[j];
-        var distance = element.distance.text;
-        tempArray.push(distance);
-      }
-      distancesOnlyMatrix.push(tempArray);
-    }
-    return distancesOnlyMatrix;
-  } else {
-    console.log('status is not OK. status = ', status);
-  }
-}
 ///////////////////////////////////////////////////////////////
-
 
   return (
     <div>
@@ -290,6 +284,7 @@ function callback(response, status) {
         <div className="flex-column">
           {totalDistance ? <h2>Your optimized route: {totalDistance}</h2> 
           : <h2>Directions will appear below</h2> }
+          { message ? <p className="errorMessage">{message}</p> : null}
           
           <h5>Click on a leg of your route to show directions:</h5>
           <ol className="leg--list">

@@ -41,6 +41,12 @@
   margin: .75rem;
 }
 
+.errorMessage {
+  font-size:1.5rem;
+  color: red;
+  font-weight: 600;
+}
+
 .leg--button {
   font-size: 1.2rem;
   cursor: pointer;
